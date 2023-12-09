@@ -1,5 +1,5 @@
 """
-This is our main driver file. It wil be responsible for user input and displaying the current GameState object.
+Dit is onze main driver file. Verantwoordelijk voor de user input en het weergeven van de current GameState object.
 """
 
 import pygame as p
@@ -13,7 +13,7 @@ MAX_FPS = 15  # voor animaties al vast.
 IMAGES = {}
 
 '''
-Initialize a global dictionary of images. This will be called exactly once in the main. 
+Initieer een global dictionary van de plaatjes van de stukken. Deze halen we maar 1x op in de main. 
 '''
 def loadImages():
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'wp', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
@@ -22,7 +22,7 @@ def loadImages():
     #Note: we can access an image by saying 'IMAGES['wp']'
 
 '''
-This will  be the main driver of our code. this will handle user input and updating the graphics. 
+Dit is de main driver van de code. Deze zal de user input afhandelen en de graphics updaten. 
 '''
 def main():
     p.init()
@@ -30,26 +30,59 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
-    loadImages() # only do this once, before the while loop.
+    validMoves = gs.getValidMoves()
+    moveMade = False #flag variable voor als er een zet is gedaan
+    loadImages() # doe dit maar 1x, voor de while loop.
     running = True
+    sqSelected = () # geen square is geselecteerd initieel, houdt de last click van de user bij,tuple: row, colum)
+    playerClicks = [] # houdt de player clicks bij (twee tuples: [(6,4), (4,4)])
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            # mouse handler
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos() # (x,y) locatie van de muis
+                col = location [0]//SQ_SIZE
+                row = location [1]//SQ_SIZE
+                if sqSelected == (row, col): # de user klikte 2x op zelfde vak
+                    sqSelected = () # deselect
+                    playerClicks = [] # clear player clicks
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected) # append voor zowel 1e als 2e clicks
+                if len(playerClicks) == 2: #was na 2e click
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    if move in validMoves:
+                        gs.makeMove(move)
+                    moveMade = True
+                    sqSelected = () #reset user clicks
+                    playerClicks = []
+            # key handlers
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z: # maak zet ongedaan wanneer 'z'  is ingedrukt
+                    gs.undomove()
+                    validMoves = gs.getValidMoves()
+                    moveMade = True
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
         drawGameState (screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 '''
-Responsible for all the graphics within a current gamestate
+Verantwoordelijk voor alle graphics binnen de huidige gamestate.
 '''
 def drawGameState(screen, gs):
-    drawBoard(screen) # draw the squares on the board.
-    #draw in piece highlighting and move suggestions
-    drawPieces(screen, gs.board) # draw the pieces on top of the squares
+    drawBoard(screen) # teken de vakken op het bord
+    #teken in stukken, highlighting en zet suggesties
+    drawPieces(screen, gs.board) # teken de stukken boven op de vakken
 
 '''
-Draw the squares on the board. The topleft square is always light.
+Teken de vakken op het bord. linksboven is altijd wit. 
 '''
 def drawBoard(screen):
     colors = [p.Color("white"), p.Color("gray")]
@@ -59,7 +92,7 @@ def drawBoard(screen):
             p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 '''
-Draw the pieces on the board using the current GameState.board.
+Teken de stukken op het bord, voortbordurend op de huidige GameState.board.
 '''
 def drawPieces(screen, board):
     for r in range(DIMENSION):
