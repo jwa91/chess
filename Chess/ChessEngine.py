@@ -93,37 +93,99 @@ class GameState():
     '''
     zelfde voor de toren zetten
     '''
-
     def getRookMoves(self, r, c, moves):
-        pass
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))  # omhoog, links, omlaag, rechts
+
+        for dr, dc in directions:
+            for i in range(1, 8):
+                nr, nc = r + i * dr, c + i * dc
+                if 0 <= nr < 8 and 0 <= nc < 8:
+                    if self.board[nr][nc] == "--":  # Leeg vak, geldige zet
+                        moves.append(Move((r, c), (nr, nc), self.board))
+                    else:
+                        if self.board[nr][nc][0] != self.board[r][c][0]:  # Capture tegenstander's stuk
+                            moves.append(Move((r, c), (nr, nc), self.board))
+                        if self.board[nr][nc][0] == 'w' and self.board[r][c][0] == 'w':
+                            break  # Stop witte torenbeweging na het bereiken van een eigen wit stuk
+                        elif self.board[nr][nc][0] == 'b' and self.board[r][c][0] == 'b':
+                            break  # Stop zwarte torenbeweging na het bereiken van een eigen zwart stuk
+                        else:
+                            moves.append(Move((r, c), (nr, nc), self.board))
+                            break  # Stop na het blokkeren van het pad door een ander stuk
+                else:
+                    break  # Stop in deze richting als buiten het bord
 
     '''
     zelfde voor de Paard zetten
     '''
 
     def getKnightMoves(self, r, c, moves):
-        pass
+        knight_moves = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
+
+        for dr, dc in knight_moves:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < 8 and 0 <= nc < 8:
+                if self.board[nr][nc] == "--" or self.board[nr][nc][0] != self.board[r][c][0]:
+                    moves.append(Move((r, c), (nr, nc), self.board))
 
     '''
     zelfde voor de loper zetten
     '''
 
     def getBishopMoves(self, r, c, moves):
-        pass
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))  # Diagonale richtingen
+        for dr, dc in directions:
+            for i in range(1, 8):
+                nr, nc = r + i * dr, c + i * dc
+                if 0 <= nr < 8 and 0 <= nc < 8:
+                    if self.board[nr][nc] == "--":  # Leeg vak, geldige zet
+                        moves.append(Move((r, c), (nr, nc), self.board))
+                    else:
+                        if self.board[nr][nc][0] != self.board[r][c][0]:  # Capture tegenstander's stuk
+                            moves.append(Move((r, c), (nr, nc), self.board))
+                        break  # Stop na het vangen, want verdere beweging wordt geblokkeerd door een stuk
+                    if self.whiteToMove and self.board[nr][nc][0] == 'w':
+                        break  # Stop witte loperbeweging na het bereiken van een eigen wit stuk
+                    elif not self.whiteToMove and self.board[nr][nc][0] == 'b':
+                        break  # Stop zwarte loperbeweging na het bereiken van een eigen zwart stuk
+                else:
+                    break  # Stop in deze richting als buiten het bord
 
     '''
     zelfde voor de Dame zetten
     '''
 
     def getQueenMoves(self, r, c, moves):
-        pass
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1))  # Alle richtingen
+        for dr, dc in directions:
+            for i in range(1, 8):
+                nr, nc = r + i * dr, c + i * dc
+                if 0 <= nr < 8 and 0 <= nc < 8:
+                    if self.board[nr][nc] == "--":  # Leeg vak, geldige zet
+                        moves.append(Move((r, c), (nr, nc), self.board))
+                    else:
+                        if self.board[nr][nc][0] != self.board[r][c][0]:  # Capture tegenstander's stuk
+                            moves.append(Move((r, c), (nr, nc), self.board))
+                        break  # Stop na het vangen, want verdere beweging wordt geblokkeerd door een stuk
+                    if self.whiteToMove and self.board[nr][nc][0] == 'w':
+                        break  # Stop witte damebeweging na het bereiken van een eigen wit stuk
+                    elif not self.whiteToMove and self.board[nr][nc][0] == 'b':
+                        break  # Stop zwarte damebeweging na het bereiken van een eigen zwart stuk
+                else:
+                    break  # Stop in deze richting als buiten het bord
 
     '''
     zelfde voor de Koning zetten
     '''
 
     def getKingMoves(self, r, c, moves):
-        pass
+        directions = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Alle richtingen
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < 8 and 0 <= nc < 8:
+                if self.board[nr][nc] == "--" or self.board[nr][nc][0] != self.board[r][c][0]:
+                    moves.append(Move((r, c), (nr, nc), self.board))
+
 
 class Move():
     # mapt keys naar waardes
