@@ -16,13 +16,15 @@ class GameState():
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "bp", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
         self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves,
                               'B': self.getBishopMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves}
         self.whiteToMove = True
         self.movelog = []
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
 
     '''
     neemt een zet als een parameter en voert hem uit. (gaat niet werken voor rokkade, promotie en passant)
@@ -33,31 +35,77 @@ class GameState():
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.movelog.append(move)  # log de zet, voor ongedaan maken en naspelen
         self.whiteToMove = not self.whiteToMove  # verandert wie aan zet is
+        #update locatie van de koning als de koning van plaats verandert.
+        if move.pieceMoved == 'wK':
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            self.blackKingLocation = (move.endRow, move.endCol)
 
     '''
     maak de laatste zet ongedaan
     '''
 
-    def undomove(self):
+    def undoMove(self):
         if len(self.movelog) != 0:  # is er een zet om ongedaan te maken.
             move = self.movelog.pop()
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
+            #positie van de koning
+            if move.pieceMoved == 'wK':
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == 'bK':
+                self.blackKingLocation = (move.startRow, move.startCol)
 
     '''
     Alle zetten rekening houdend met schaak
     '''
 
     def getValidMoves(self):
-        return self.getAllPossibleMoves()  # voor nu houden we geen rekening met checks, fixen we later.
+        #eerst alle mogelijke zetten genereren
+        moves = self.getAllPossibleMoves()
+        #dan de zet maken
+        for i in range(len(moves) -1, -1, -1): #handiger om achteraan te beginnen
+            self.makeMove(moves[i])
+            #na elke zet elke tegenstander zet genereren
+            #na elke tegenstander zet kijken of die zet de koning aan valt
+            self.whiteToMove = not self.whiteToMove #eerst weer terugveranderen van zetten
+            if self.inCheck():
+                moves.remove(moves[i]) #als ze de koning aanvallen, is het geen geldige zet
+            self.whiteToMove = not self.whiteToMove
+            self.undoMove()
+
+        return moves
+
+    '''
+    bepalen of de huidige speler schaak staat
+    '''
+
+    def inCheck(self):
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    '''
+    Bepalen of de tegenstander het vak kan aanvallen (self, r, c)
+    '''
+
+    def squareUnderAttack(self, r, c):
+        self.whiteToMove = not self.whiteToMove #POV van tegenstander
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove
+        for move in oppMoves:
+            if move.endRow == r and move.endCol == c: #veld onder aanval
+                return True
+        return False
 
     '''
     Alle zetten zonder rekening te houden met schaak
     '''
 
     def getAllPossibleMoves(self):
-        moves = [Move]
+        moves = []
         for r in range(len(self.board)):  # aantal rijen
             for c in range(len(self.board[r])):  # aantal kolommen in een bepaalde rij
                 turn = self.board[r][c][0]
@@ -177,9 +225,9 @@ class GameState():
     def getKingMoves(self, r, c, moves):
         kingmoves = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Alle richtingen
         allyColor = "b" if self.whiteToMove else "w"
-        for m in kingmoves:
-            endRow = r + m[0]
-            endCol = c + m[1]
+        for i in range(8):
+            endRow = r + kingmoves[i][0]
+            endCol = c + kingmoves[i][1]
             if 0 <= endRow < 8 and 0 <= endCol < 8:
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] != allyColor:
