@@ -63,7 +63,7 @@ def main():
             # key handlers
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: # maak zet ongedaan wanneer 'z'  is ingedrukt
-                    gs.undomove()
+                    gs.undoMove()
                     validMoves = gs.getValidMoves()
                     moveMade = True
         if moveMade:
