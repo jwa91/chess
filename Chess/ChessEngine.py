@@ -209,7 +209,7 @@ class GameState():
 
     def getKnightMoves(self, r, c, moves):
         knightmoves = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
-        allyColor = "b" if self.whiteToMove else "w"
+        allyColor = "w" if self.whiteToMove else "b"
         for m in knightmoves:
             endRow = r + m[0]
             endCol = c + m[1]
@@ -224,7 +224,7 @@ class GameState():
 
     def getKingMoves(self, r, c, moves):
         kingmoves = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Alle richtingen
-        allyColor = "b" if self.whiteToMove else "w"
+        allyColor = "w" if self.whiteToMove else "b"
         for i in range(8):
             endRow = r + kingmoves[i][0]
             endCol = c + kingmoves[i][1]
