@@ -25,6 +25,8 @@ class GameState():
         self.movelog = []
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
+        self.checkMate = False
+        self.staleMate = False
 
     '''
     neemt een zet als een parameter en voert hem uit. (gaat niet werken voor rokkade, promotie en passant)
@@ -74,7 +76,14 @@ class GameState():
                 moves.remove(moves[i]) #als ze de koning aanvallen, is het geen geldige zet
             self.whiteToMove = not self.whiteToMove
             self.undoMove()
-
+        if len(moves) == 0: #of schaakmat of pad
+            if self.incheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
         return moves
 
     '''

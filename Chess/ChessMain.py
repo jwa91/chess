@@ -57,9 +57,11 @@ def main():
                     print(move.getChessNotation())
                     if move in validMoves:
                         gs.makeMove(move)
-                    moveMade = True
-                    sqSelected = () #reset user clicks
-                    playerClicks = []
+                        moveMade = True
+                        sqSelected = () #reset user clicks
+                        playerClicks = []
+                    else:
+                        playerClicks = [sqSelected]
             # key handlers
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: # maak zet ongedaan wanneer 'z'  is ingedrukt
