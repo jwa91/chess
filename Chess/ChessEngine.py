@@ -71,7 +71,7 @@ class GameState():
             self.makeMove(moves[i])
             #na elke zet elke tegenstander zet genereren
             #na elke tegenstander zet kijken of die zet de koning aan valt
-            self.whiteToMove = not self.whiteToMove #eerst weer terugveranderen van zetten
+            self.whiteToMove = not self.whiteToMove #eerst weer terugveranderen van wie aan zet is, omdat de make move functie al een beurt verarndering bevat.
             if self.inCheck():
                 moves.remove(moves[i]) #als ze de koning aanvallen, is het geen geldige zet
             self.whiteToMove = not self.whiteToMove
