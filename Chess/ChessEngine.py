@@ -8,7 +8,7 @@ class GameState():
     def __init__(self):
         # bord is een 8x8 2d list. Elk element op de lijst heeft 2 karakters.
         # het 1e karakter is de kleur, 'b' or 'w'.
-        # the 2e karakter is het type stuk, 'K', 'Q', 'R', 'B', 'N' or 'p'.
+        # the 2e karakter is het type stuk, 'K', 'Q', 'R', 'B', 'N' of 'p'.
         # "--" - voor lege vakken.
         self.board = [
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
