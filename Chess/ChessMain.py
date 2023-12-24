@@ -19,7 +19,7 @@ def loadImages():
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'wp', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
-    #Note: we can access an image by saying 'IMAGES['wp']'
+    #Note: we kunnen toegang tot alle afbeeldingen krijgen met 'IMAGES['wp']'
 
 '''
 Dit is de main driver van de code. Deze zal de user input afhandelen en de graphics updaten. 
